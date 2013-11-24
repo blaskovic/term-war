@@ -1,3 +1,5 @@
+src/head.tpl
+
 *.py[cod]
 
 # C extensions

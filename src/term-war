@@ -1,0 +1,53 @@
+#!/usr/bin/python2
+
+#
+# term-war
+#
+# Copyright (c) 2013
+#
+# Author Branislav Blaskovic <branislav@blaskovic.sk>
+#
+
+import sys
+import random
+from decorations import Colors
+from interaction import Writer
+from interaction import Prompt
+from connection import ClientConnection
+
+# Wanna usage?
+if len(sys.argv) < 3:
+    print "Usage: " + sys.argv[0] + " host port"
+    sys.exit(1)
+
+# Init basic stuff
+writer = Writer()
+prompt = Prompt()
+Color = Colors()
+key = random.getrandbits(128)
+
+# Welcome user to game
+writer.out('Welcome to term-war!', Color.RED)
+writer.out(' - made by Branislav Blaskovic <branislav@blaskovic.sk>')
+writer.out('')
+writer.out('You communicating key is ' + str(key), Color.YELLOW)
+
+# Init connection
+con = ClientConnection(sys.argv[1], int(sys.argv[2]))
+#con.connect()
+
+# Test connection
+writer.out('Is server working? ', new_line=False)
+respond = con.send('CHECK')
+writer.out(respond)
+
+# Set side!
+while True:
+    answer = prompt.ask('What player do you want? [A/B]')
+    con.send('CHECK')
+    respond = con.send('SETKEY ' + str(key) + ' ' + str(answer))
+    if respond != 'ACK':
+        writer.out(respond, Color.RED)
+    else:
+        break
+
