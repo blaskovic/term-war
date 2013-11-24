@@ -10,10 +10,13 @@
 
 import sys
 from connection import ServerConnection
+from game import MainGame
 
 # Wanna usage?
 if len(sys.argv) < 3:
     print "Usage: " + sys.argv[0] + " host port"
     sys.exit(1)
 
-con = ServerConnection(sys.argv[1], int(sys.argv[2]))
+game = MainGame()
+
+con = ServerConnection(sys.argv[1], int(sys.argv[2]), game)

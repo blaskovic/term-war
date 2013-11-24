@@ -48,6 +48,8 @@ class ClientConnection:
 # Server part
 #
 
+game = None
+
 class ServerTCPHandler(SocketServer.BaseRequestHandler):
 
     def handle(self):
@@ -59,18 +61,31 @@ class ServerTCPHandler(SocketServer.BaseRequestHandler):
         # What to do?
         argv = data.split(" ")
         action = argv[0]
-        print 'Action: ' + str(action)
 
         # Just try to process connection
         try:
+            # Basic connection check
             if action == 'CHECK':
                 self.send_back('ACK')
+            # Attach key to player
             elif action == 'SETKEY' and len(argv) == 3:
                 action, key, player = argv
-                if player not in ['A', 'B']:
-                    self.send_back('You have to choose between A or B')
+                # A
+                if player == 'A':
+                    if game.playerA.key != None:
+                        self.send_back('Player A is already taken.')
+                    else:
+                        game.playerA.set_key(key)
+                        self.send_back('ACK')
+                # B
+                elif player == 'B':
+                    if game.playerB.key != None:
+                        self.send_back('Player B is already taken.')
+                    else:
+                        game.playerB.set_key(key)
+                        self.send_back('ACK')
                 else:
-                    self.send_back('ACK')
+                    self.send_back('You have to choose between A or B')
 
         except:
             print 'ERROR in handle()'
@@ -81,9 +96,11 @@ class ServerTCPHandler(SocketServer.BaseRequestHandler):
         self.request.sendall(data)
 
 class ServerConnection:
-    def __init__(self, ip, port):
+    def __init__(self, ip, port, game_instance):
         self.ip = ip
         self.port = port
+        global game
+        game = game_instance
 
         # Create the server, binding to localhost on port 9999
         server = SocketServer.TCPServer((self.ip, self.port), ServerTCPHandler)
